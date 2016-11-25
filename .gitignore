@@ -161,7 +161,6 @@ $RECYCLE.BIN/
 *.log 
 *.tmp 
 *.xref 
-*.pdf 
 *.pnd 
 *.bbl 
 *.bcf 
@@ -184,7 +183,6 @@ $RECYCLE.BIN/
 *.tps 
 *.blx.bib 
 *.run.xml
-*.pdf
 *.bbl
 *.bcf
 *.blg

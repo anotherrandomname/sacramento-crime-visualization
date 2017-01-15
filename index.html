@@ -1,33 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
     <meta charset="UTF-8">
-    <title>Sacramento Crime Dataset Visualization</title>
+    <title>Sacramento Crime Ds</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="./style.css">
-    <link rel="stylesheet" href="css/foundation.css">
-    <link rel="stylesheet" href="css/app.css">
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+    <script src="http://code.jquery.com/jquery.js"></script>
 </head>
 
 <body>
 
-
-    <div class="row">
-        <div class="large-12 columns">
-            <h1>Sacramento Crime Dataset Visualization</h1>
-        </div>
-        <div class="large-12 columns">
-            <p><a href="task1.html" class="button">Task 1</a><br/>
-                <a href="task2.html" class="success button">Task 2</a></p>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="brand" href="#">Sacramento Crime DS</a>
+                <div class="nav-collapse collapse">
+                    <ul class="nav">
+                        <li class="active"><a href="#">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div>
         </div>
     </div>
 
+    <div>
 
-    <script src="js/vendor/jquery.js"></script>
-    <script src="js/vendor/what-input.js"></script>
-    <script src="js/vendor/foundation.js"></script>
-    <script src="js/app.js"></script>
+        <div class="leftSVG">
+            <div class="svg1Here" />
+        </div>
+
+        <div class="rightSVG">
+            <h2>Dangerousness of Sacramento's district at a certain time.</h2>
+            <div class="svg2Here" />
+        </div>
+
+    </div> <!-- /container -->
+
+  <!--include bootstrap and jquery -->
+  <script src="http://code.jquery.com/jquery.js"></script>
+  <script src="bootstrap/js/bootstrap.min.js"></script>
+  <!--include d3-->
+  <script src="./web_modules/d3/build/d3.js"></script>
+  <!--include our script-->
+  <script src="./index.js"></script>
 </body>
 
 </html>

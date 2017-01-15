@@ -84,8 +84,14 @@ d3.csv("data/SacramentocrimeJanuary2006.csv", function(error, data) {
     var layer = svg.selectAll("layer")
         .data(stackedData)
         .enter().append("g")
-        .attr("class", "layer")
-        .style("fill", function(d, i) { return z(i); })
+        .attr("class", (d, i) => "layer color-" + z(i).substring(1))
+        .style("fill", (d, i) => z(i))
+        .on("mouseover", function(d,i) {
+            svg.selectAll(".legend-dist-color-" + z(i).substring(1)).style("fill", "blue");
+        })
+        .on("mouseout", function(d,i) {
+            svg.selectAll(".legend-dist-color-" + z(i).substring(1)).style("fill", "black");
+        });
 
     var rect = layer.selectAll("rect")
         .data(function(d){return d;})
@@ -95,8 +101,12 @@ d3.csv("data/SacramentocrimeJanuary2006.csv", function(error, data) {
         .attr("y", (d) => y(d[1]) )
         .attr("height", (d) => y(d[0]) - y(d[1]) )
         .attr("width", x.bandwidth())
-        .on("mouseover", function() { tooltip_c.style("display", null); })
-        .on("mouseout", function() { tooltip_c.style("display", "none"); })
+        .on("mouseover", function(d,i) {
+            tooltip_c.style("display", null);
+        })
+        .on("mouseout", function(d,i) {
+            tooltip_c.style("display", "none");
+        })
         .on("mousemove", function(d) {
             var xPosition = d3.mouse(this)[0] - 15;
             var yPosition = d3.mouse(this)[1] - 25;
@@ -111,7 +121,14 @@ d3.csv("data/SacramentocrimeJanuary2006.csv", function(error, data) {
         .selectAll("g")
         .data(legendKeys.slice().reverse())
         .enter().append("g")
-        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+        .attr("class", (d, i) => "legend-dist-color-" + z(i).substring(1))
+        .attr("transform", (d, i) => "translate(0," + i * 20 + ")")
+        .on("mouseover", (d,i) => {
+            svg.selectAll(".color-" + z(i).substring(1)).style("stroke", "black");
+        })
+        .on("mouseout", (d,i) => {
+            svg.selectAll(".color-" + z(i).substring(1)).style("stroke", "white");
+        });
 
     legend.append("rect")
         .attr("x", width - 18)

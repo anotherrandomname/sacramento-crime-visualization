@@ -29,25 +29,28 @@
                         <li><a href="about.html">About</a></li>
                         <li><a href="contact.html">Contact</a></li>
                     </ul>
-                </div><!--/.nav-collapse -->
+                </div>
+                <!--/.nav-collapse -->
             </div>
         </div>
     </div>
 
     <div>
-      <!--html filter checkbox-->
+        <!--html filter checkbox-->
+        <div>
+            <strong>Map-Background:</strong>
+            <label><input type="checkbox" id="map-background"/></li>
         <div>
           <strong>Filter:</strong>
-          <ul id="filter-list">
-            <li id="filter_" class="check-temp" style="display:none"><input type="radio" /></li>
-          </ul>
+          <select id="filter-list">
+            <option id="filter_" class="check-temp" style="display:none"></option>
+          </select>
 
         </div>
         <div class="leftSVG">
             <h2>Sacramento's crimes on a map.</h2>
-            <div id="svg1Here" />
-            <!-- comment in instead of above, to see background svg -->
-            <!-- <svg id="svg1Here" width="400" height="400"/> -->
+            <!-- <div id="svg1Here" /> -->
+            <svg id="svg1HereMap" width="400" height="400" style="margin-left: 50px"/>
         </div>
         <div class="rightSVG">
             <h2>Dangerousness of Sacramento's district at a certain time.</h2>

@@ -1,4 +1,4 @@
-/*   D3 Stuff     */
+/*   Main js-file  */
 
 const margin = {
     top: 40,
@@ -35,53 +35,54 @@ const svg = d3.select('.svg2Here').append('svg')
 
 
 
+// --------------------------- map part -----------------------------
+var w = 800;
+var h = 400;
+var projection = d3.geoAlbers()
+    .translate([w * 25, h * 6.88])
+    .scale([60000]);
 
-    // --------------- map part -------------
-    var w = 800;
-    var h = 400;
-    var projection = d3.geoAlbers()
-        .translate([w * 25.1, h * 7])
-        .scale([60000]);
+var path = d3.geoPath()
+    .projection(projection);
 
-    var path = d3.geoPath()
-        .projection(projection);
+//used for json-map (json-files for sacramento not working properly)
+//Define quantize scale to sort data values into buckets of color
+//var color = d3.scaleQuantize()
+//    .range(["rgb(237,248,233)", "rgb(186,228,179)", "rgb(116,196,118)", "rgb(49,163,84)", "rgb(0,109,44)"]);
 
-    //used for json-map
-    //Define quantize scale to sort data values into buckets of color
-    //var color = d3.scaleQuantize()
-    //    .range(["rgb(237,248,233)", "rgb(186,228,179)", "rgb(116,196,118)", "rgb(49,163,84)", "rgb(0,109,44)"]);
+var svgMap = d3.select('#svg1HereMap')
+    .append("svg")
+    .attr("width", w)
+    .attr("height", h);
 
-    var svgMap = d3.select('#svg1Here')
-        .append("svg")
-        .attr("width", w)
-        .attr("height", h);
+//insert svg image
+d3.select("#svg1HereMap").append("image")
+    .attr("xlink:href", "/data/sa_zoning.svg")
+    .attr("width", 250)
+    .attr("height", 250)
+    .attr("opacity", 0.5)
+    .attr("id", "svg-image");
 
-    //insert svg image
-    d3.select("#svg1Here").append("image")
-        .attr("xlink:href", "/data/sa_zoning.svg")
-        .attr("width", 300)
-        .attr("height", 300)
-
-    //loading json
-    // d3.json("/data/ca.json", function(json) {
-    //     svg.selectAll("path")
-    //         .data(json.features)
-    //         .enter()
-    //         .append("path")
-    //         .attr("d", path)
-    //         .style("fill", function(d) {
-    //             //Get data value
-    //             var value = d.properties.value;
-    //
-    //             if (value) {
-    //                 //If value exists…
-    //                 return color(value);
-    //             } else {
-    //                 //If value is undefined…
-    //                 return "#ccc";
-    //             }
-    //         });
-    // });
+//loading json (json files for sacramento not working properly)
+// d3.json("/data/ca.json", function(json) {
+//     svg.selectAll("path")
+//         .data(json.features)
+//         .enter()
+//         .append("path")
+//         .attr("d", path)
+//         .style("fill", function(d) {
+//             //Get data value
+//             var value = d.properties.value;
+//
+//             if (value) {
+//                 //If value exists…
+//                 return color(value);
+//             } else {
+//                 //If value is undefined…
+//                 return "#ccc";
+//             }
+//         });
+// });
 
 
 
@@ -98,39 +99,48 @@ d3.csv("data/SacramentocrimeJanuary2006.csv", (d) => {
 }, (error, csv) => {
     let data = csv;
 
+    //svg image rotate workaround
+    jQuery('#svg-image').css("transform", "rotate(15deg)").css("display", "none");
 
     //draw all filter
     var crimes = [];
+
+    crimes.push("All crimes");
     data.forEach(x => {
-      crimes.push(x.crimedescr);
+        crimes.push(x.crimedescr);
     });
-    crimes = jQuery.unique(crimes).slice(0,20);
+
+    crimes = jQuery.unique(crimes);
     //interactivity
     crimes.forEach(x => {
-      jQuery('#filter_').clone().show().removeAttr('id').removeAttr('style')
-        .attr('value', x)
-        .insertAfter('.check-temp:last');
-      jQuery('.check-temp:last input').attr('value', x).attr('name', 'filter').after(x);
-
-      jQuery('.check-temp:last input').on('change', function() {
-          // This will be triggered when the user selects or unselects the checkbox
-          if ($(this).is(":checked")) {
-              // Checkbox was just checked
-
-              // Keep only data element whose country is US
-              const filtered_data = data.filter((d) => d.crimedescr == x);
-
-              update(filtered_data); // Update the chart with the filtered data
-          }
-      });
+        jQuery('#filter_').clone().show().removeAttr('id').removeAttr('style')
+            .attr('value', x)
+            .insertAfter('.check-temp:last');
+        jQuery('.check-temp:last').attr('value', x).attr('name', 'filter').html(x);
     });
 
+    jQuery('select').on('change', function() {
+      if(this.value != "All crimes"){
+        const filtered_data = data.filter((d) => d.crimedescr == this.value);
+
+        update(filtered_data); // Update the chart with the filtered data
+      }
+      else
+        update(data);
+    });
 
 
     update(data);
 });
 
 
+jQuery('#map-background').on('change', function() {
+    // This will be triggered when the user selects or unselects the checkbox
+    if ($(this).is(":checked"))
+        $('#svg-image').show();
+    else
+      $('#svg-image').hide();
+});
 
 
 function update(data) {
@@ -147,7 +157,9 @@ function update(data) {
     // new elements
     const rect_enter = rect.enter().append("circle", "rect")
         .attr("r", 1)
-        .attr("fill", "red")
+        .attr("fill", function(d, i){
+          return z(d.district);
+        })
         .attr("transform", function(d) {
             return "translate(" + projection([
                 d.longitude,

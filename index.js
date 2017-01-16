@@ -33,14 +33,160 @@ const svg = d3.select('.svg2Here').append('svg')
     .append('g')
     .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
-d3.csv("data/SacramentocrimeJanuary2006.csv", function(error, data) {
-    if (error) throw error;
 
-    // convert datatypes
-    data.forEach(function(d) {
-        d.cdatetime = parseDate(d.cdatetime).getHours();
-        d.district = +d.district;
+
+
+    // --------------- map part -------------
+    var w = 800;
+    var h = 400;
+    var projection = d3.geoAlbers()
+        .translate([w * 25.1, h * 7])
+        .scale([60000]);
+
+    var path = d3.geoPath()
+        .projection(projection);
+
+    //used for json-map
+    //Define quantize scale to sort data values into buckets of color
+    //var color = d3.scaleQuantize()
+    //    .range(["rgb(237,248,233)", "rgb(186,228,179)", "rgb(116,196,118)", "rgb(49,163,84)", "rgb(0,109,44)"]);
+
+    var svgMap = d3.select('#svg1Here')
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h);
+
+    //insert svg image
+    d3.select("#svg1Here").append("image")
+        .attr("xlink:href", "/data/sa_zoning.svg")
+        .attr("width", 300)
+        .attr("height", 300)
+
+    //loading json
+    // d3.json("/data/ca.json", function(json) {
+    //     svg.selectAll("path")
+    //         .data(json.features)
+    //         .enter()
+    //         .append("path")
+    //         .attr("d", path)
+    //         .style("fill", function(d) {
+    //             //Get data value
+    //             var value = d.properties.value;
+    //
+    //             if (value) {
+    //                 //If value exists…
+    //                 return color(value);
+    //             } else {
+    //                 //If value is undefined…
+    //                 return "#ccc";
+    //             }
+    //         });
+    // });
+
+
+
+//Load sacramento crime data and map coordinates from csv
+d3.csv("data/SacramentocrimeJanuary2006.csv", (d) => {
+    // convert needed datatypes
+    return {
+        cdatetime: parseDate(d.cdatetime).getHours(),
+        district: +d.district,
+        latitude: d.latitude,
+        longitude: d.longitude,
+        crimedescr: d.crimedescr
+    };
+}, (error, csv) => {
+    let data = csv;
+
+
+    //draw all filter
+    var crimes = [];
+    data.forEach(x => {
+      crimes.push(x.crimedescr);
     });
+    crimes = jQuery.unique(crimes).slice(0,20);
+    //interactivity
+    crimes.forEach(x => {
+      jQuery('#filter_').clone().show().removeAttr('id').removeAttr('style')
+        .attr('value', x)
+        .insertAfter('.check-temp:last');
+      jQuery('.check-temp:last input').attr('value', x).attr('name', 'filter').after(x);
+
+      jQuery('.check-temp:last input').on('change', function() {
+          // This will be triggered when the user selects or unselects the checkbox
+          if ($(this).is(":checked")) {
+              // Checkbox was just checked
+
+              // Keep only data element whose country is US
+              const filtered_data = data.filter((d) => d.crimedescr == x);
+
+              update(filtered_data); // Update the chart with the filtered data
+          }
+      });
+    });
+
+
+
+    update(data);
+});
+
+
+
+
+function update(data) {
+    // --- map ---
+    // join
+
+    //show only crimes of selected district
+    //TODO remove this and use merge
+    svgMap.selectAll(".crime").remove();
+    svg.selectAll("rect").remove();
+
+    var rect = svgMap.selectAll('rect').data(data);
+
+    // new elements
+    const rect_enter = rect.enter().append("circle", "rect")
+        .attr("r", 1)
+        .attr("fill", "red")
+        .attr("transform", function(d) {
+            return "translate(" + projection([
+                d.longitude,
+                d.latitude
+            ]) + ")";
+        });
+
+    rect_enter.merge(rect_enter)
+        .attr("class", (d) => "crime district-" + d.district + " crimedescr-" + d.crimedescr + " hour-" + d.cdatetime);
+
+
+    // elements that aren't associated with data
+    rect.exit().remove();
+
+    //crimes filter
+    let legend = svgMap.append("g")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", 10)
+        .attr("text-anchor", "end")
+        .selectAll("g")
+        .data(legendKeys.slice().reverse())
+        .enter().append("g")
+        .attr("class", (d, i) => "legend-dist-color-" + z(i).substring(1))
+        .attr("transform", (d, i) => "translate(0," + i * 20 + ")")
+        .on("mouseover", (d, i) => {
+            svg.selectAll(".color-" + z(i).substring(1)).style("stroke", "black");
+
+            //show only crimes of selected district
+            svgMap.selectAll(".crime").style("fill-opacity", "0");
+            svgMap.selectAll(".district-" + (i - 6) * -1).style("fill-opacity", "100");
+        })
+        .on("mouseout", (d, i) => {
+            svg.selectAll(".color-" + z(i).substring(1)).style("stroke", "white");
+
+            //show all crimes again
+            svgMap.selectAll(".crime").style("fill-opacity", "100");
+        });
+
+    // ------------
 
     // group by datetime and count items
     data = d3.nest()
@@ -92,7 +238,7 @@ d3.csv("data/SacramentocrimeJanuary2006.csv", function(error, data) {
             svg.selectAll(".legend-dist-color-" + z(i).substring(1)).style("fill", "black");
         });
 
-    var rect = layer.selectAll("rect")
+    rect = layer.selectAll("rect")
         .data(function(d) {
             return d;
         })
@@ -104,9 +250,15 @@ d3.csv("data/SacramentocrimeJanuary2006.csv", function(error, data) {
         .attr("width", x.bandwidth())
         .on("mouseover", function(d, i) {
             tooltip_c.style("display", null);
+
+            //show only crimes of selected district
+            svgMap.selectAll(".crime").style("fill-opacity", "0")
+            svgMap.selectAll(".hour-" + d.data.time).style("fill-opacity", "100");
         })
         .on("mouseout", function(d, i) {
             tooltip_c.style("display", "none");
+            //show all crimes again
+            svgMap.selectAll(".crime").style("fill-opacity", "100");
         })
         .on("mousemove", function(d) {
             var xPosition = d3.mouse(this)[0] - 15;
@@ -115,7 +267,10 @@ d3.csv("data/SacramentocrimeJanuary2006.csv", function(error, data) {
             tooltip_c.select("text").text(d[1] - d[0]);
         });
 
-    let legend = svg.append("g")
+
+
+    // district legend
+    let legend2 = svg.append("g")
         .attr("font-family", "sans-serif")
         .attr("font-size", 10)
         .attr("text-anchor", "end")
@@ -128,23 +283,23 @@ d3.csv("data/SacramentocrimeJanuary2006.csv", function(error, data) {
             svg.selectAll(".color-" + z(i).substring(1)).style("stroke", "black");
 
             //show only crimes of selected district
-            svgMap.selectAll(".crime").style("fill-opacity", "0")
-            svgMap.selectAll(".district-" + (i-6)*-1).style("fill-opacity", "100");
+            svgMap.selectAll(".crime").style("fill-opacity", "0");
+            svgMap.selectAll(".district-" + (i - 6) * -1).style("fill-opacity", "100");
         })
         .on("mouseout", (d, i) => {
             svg.selectAll(".color-" + z(i).substring(1)).style("stroke", "white");
 
             //show all crimes again
-            svgMap.selectAll(".crime").style("fill-opacity", "100")
+            svgMap.selectAll(".crime").style("fill-opacity", "100");
         });
 
-    legend.append("rect")
+    legend2.append("rect")
         .attr("x", width - 18)
         .attr("width", 18)
         .attr("height", 18)
         .style("fill", z);
 
-    legend.append("text")
+    legend2.append("text")
         .attr("x", width - 24)
         .attr("y", 9)
         .attr("dy", ".35em")
@@ -171,7 +326,9 @@ d3.csv("data/SacramentocrimeJanuary2006.csv", function(error, data) {
         .attr("font-size", "12px")
         .attr("font-weight", "bold");
 
-});
+
+}
+
 
 /* helper functions */
 
@@ -222,88 +379,3 @@ function Entry(time) {
 
 let keys = ["district1", "district2", "district3", "district4", "district5", "district6"];
 let legendKeys = ["District 1", "District 2", "District 3", "District 4", "District 5", "District 6"];
-
-
-
-
-// --------------- map part -------------
-var w = 800;
-var h = 400;
-var projection = d3.geoAlbers()
-    .translate([w * 25.1, h * 7])
-    .scale([60000]);
-
-var path = d3.geoPath()
-    .projection(projection);
-
-//used for json-map
-//Define quantize scale to sort data values into buckets of color
-//var color = d3.scaleQuantize()
-//    .range(["rgb(237,248,233)", "rgb(186,228,179)", "rgb(116,196,118)", "rgb(49,163,84)", "rgb(0,109,44)"]);
-
-var svgMap = d3.select('#svg1Here')
-    .append("svg")
-    .attr("width", w)
-    .attr("height", h);
-
-//insert svg image
-d3.select("#svg1Here").append("image")
-    .attr("xlink:href", "/data/sa_zoning.svg")
-    .attr("width", 300)
-    .attr("height", 300)
-
-//loading json
-// d3.json("/data/ca.json", function(json) {
-//     svg.selectAll("path")
-//         .data(json.features)
-//         .enter()
-//         .append("path")
-//         .attr("d", path)
-//         .style("fill", function(d) {
-//             //Get data value
-//             var value = d.properties.value;
-//
-//             if (value) {
-//                 //If value exists…
-//                 return color(value);
-//             } else {
-//                 //If value is undefined…
-//                 return "#ccc";
-//             }
-//         });
-// });
-
-//Load sacramento crime data and map coordinates
-d3.csv('/data/SacramentocrimeJanuary2006.csv', (d) => {
-    return {
-        latitude: d.latitude,
-        longitude: d.longitude,
-        district: d.district,
-        crimedescr: d.crimedescr
-    };
-}, (error, csv) => {
-    let data = csv;
-
-    update(data);
-});
-
-function update(new_data) {
-
-    // join
-    const rect = svgMap.selectAll('rect').data(new_data);
-
-    // new elements
-    const rect_enter = rect.enter().append("circle", "rect")
-        .attr("r", 1)
-        .attr("fill", "red")
-        .attr("transform", function(d) {
-            return "translate(" + projection([
-                d.longitude,
-                d.latitude
-            ]) + ")";
-        })
-        .attr("class", (d) => "crime district-" + d.district + " crimedescr-" + d.crimedescr);
-
-    // elements that aren't associated with data
-    rect.exit().remove();
-}

@@ -6,7 +6,7 @@
     <title>Sacramento Crime Ds</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="css/style.css">
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
     <script src="http://code.jquery.com/jquery.js"></script>
@@ -14,58 +14,70 @@
 
 <body>
 
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="navbar-inner">
-            <div class="container">
-                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="brand" href="#">Sacramento Crime DS</a>
-                <div class="nav-collapse collapse">
-                    <ul class="nav">
-                        <li class="active"><a href="#">Home</a></li>
-                        <li><a href="about.html">About</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
-                </div>
-                <!--/.nav-collapse -->
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="#">Sacramento Crime DS</a>
+            <div class="nav-collapse collapse">
+                <ul class="nav">
+                    <li class="active"><a href="#">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
             </div>
+            <!--/.nav-collapse -->
         </div>
+    </div>
+</div>
+
+<div>
+    <!--html filter checkbox-->
+    <!--<div class="panel panel-primary">-->
+    <!--<div class="panel panel-heading">-->
+    <!--<h3 class="panel-title">Title</h3>-->
+    <!--</div>-->
+    <!--<div class="panel-body">-->
+    <!--Content-->
+    <!--</div>-->
+    <!--</div>-->
+
+    <div>
+        <strong>Map-Background:</strong>
+        <label><input type="checkbox" id="map-background"/></label>
     </div>
 
     <div>
-        <!--html filter checkbox-->
-        <div>
-            <strong>Map-Background:</strong>
-            <label><input type="checkbox" id="map-background"/></li>
-        <div>
-          <strong>Filter:</strong>
-          <select id="filter-list">
+        <strong>Filter:</strong>
+        <select id="filter-list">
             <option id="filter_" class="check-temp" style="display:none"></option>
-          </select>
+        </select>
+    </div>
 
+    <div>
+        <div id="svg1">
+            <h3>Sacramento's crimes on a map.</h3>
+            <svg id="svg1HereMap"/>
         </div>
-        <div class="leftSVG">
-            <h2>Sacramento's crimes on a map.</h2>
-            <!-- <div id="svg1Here" /> -->
-            <svg id="svg1HereMap" width="400" height="400" style="margin-left: 50px"/>
+        <div id="svg2">
+            <h3>Dangerousness of Sacramento's district at a certain time.</h3>
+            <div class="svg2Here"/>
         </div>
-        <div class="rightSVG">
-            <h2>Dangerousness of Sacramento's district at a certain time.</h2>
-            <div class="svg2Here" />
-        </div>
+    </div>
 
-    </div> <!-- /container -->
+</div> <!-- /container -->
 
-  <!--include bootstrap and jquery -->
-  <script src="http://code.jquery.com/jquery.js"></script>
-  <script src="bootstrap/js/bootstrap.min.js"></script>
-  <!--include d3-->
-  <script src="./web_modules/d3/build/d3.js"></script>
-  <!--include our script-->
-  <script src="./index.js"></script>
+<!--include bootstrap and jquery -->
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<!--include d3-->
+<script src="./web_modules/d3/build/d3.js"></script>
+<!--include our script-->
+<script src="./index.js"></script>
 </body>
 
 </html>

@@ -21,6 +21,27 @@ body {
    shape-rendering: crispEdges;
 }
 
+/*.rightSVG{*/
+   /*float: right;*/
+   /*width: 50%;*/
+/*}*/
+
+#svg1 {
+   width: 40%;
+   height: 400px;
+   margin-left: 50px;
+   float: left;
+}
+
+#svg2 {
+   margin-left: 5%;
+   height: 400px;
+}
+
+#svg1HereMap {
+   height: 400px;
+}
+
 .dot {
    stroke: #000;
 }

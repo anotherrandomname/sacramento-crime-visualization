@@ -6,8 +6,8 @@ const margin = {
     left: 200,
     right: 20
 };
-const width = 1000 - margin.left - margin.right;
-const height = 600 - margin.top - margin.bottom;
+const width = 800 - margin.left - margin.right;
+const height = 400 - margin.top - margin.bottom;
 
 let x = d3.scaleBand()
     .rangeRound([0, width])
@@ -57,7 +57,7 @@ var svgMap = d3.select('#svg1HereMap')
 
 //insert svg image
 d3.select("#svg1HereMap").append("image")
-    .attr("xlink:href", "/data/sa_zoning.svg")
+    .attr("xlink:href", "data/sa_zoning.svg")
     .attr("width", 250)
     .attr("height", 250)
     .attr("opacity", 0.5)
@@ -199,7 +199,7 @@ function update(data) {
             svgMap.selectAll(".crime").style("fill-opacity", "100");
         });
 
-    // ------------
+    // ------------ BARS ----------------
 
     // group by datetime and count items
     data = d3.nest()

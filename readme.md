@@ -1,3 +1,8 @@
+Sacramento Crime Visualization with D3
+=====================================
+
+The Sacramento crime dataset shows crime statistics from January 2006 in the city of Sacramento USA and is visualized using D3.
+
 d3 boilerplate
 ==============
 

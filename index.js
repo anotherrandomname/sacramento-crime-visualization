@@ -110,13 +110,15 @@ d3.csv("data/SacramentocrimeJanuary2006.csv", (d) => {
         crimes.push(x.crimedescr);
     });
 
-    crimes = jQuery.unique(crimes);
+
+    //limit crime selection for firefox
+    crimes = jQuery.unique(crimes).slice(0,150);
     //interactivity
     crimes.forEach(x => {
         jQuery('#filter_').clone().show().removeAttr('id').removeAttr('style')
             .attr('value', x)
+            .html(x)
             .insertAfter('.check-temp:last');
-        jQuery('.check-temp:last').attr('value', x).attr('name', 'filter').html(x);
     });
 
     jQuery('select').on('change', function() {
@@ -148,7 +150,6 @@ function update(data) {
     // join
 
     //show only crimes of selected district
-    //TODO remove this and use merge
     svgMap.selectAll(".crime").remove();
     svg.selectAll("rect").remove();
 
